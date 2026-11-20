@@ -1,15 +1,28 @@
 package fr.stefangeorgesco.smartbar.backoffice.api;
 
+import fr.stefangeorgesco.smartbar.backoffice.ArticlesService;
+import fr.stefangeorgesco.smartbar.backoffice.api.model.Article;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @QuarkusTest
 class ArticlesResourceTest {
+
+    @InjectMock
+    ArticlesService articlesService;
+
+    @BeforeEach
+    void setUp() {
+        when(articlesService.get()).thenReturn(new Article().name("Mock article"));
+    }
 
     @Test
     void articlesArticleIdDelete() {
@@ -27,7 +40,7 @@ class ArticlesResourceTest {
                 .statusCode(200)
                 .extract().response();
         final JsonPath jsonPath = response.jsonPath();
-        assertEquals("Chardonnay", jsonPath.getString("name"));
+        assertEquals("Mock article", jsonPath.getString("name"));
     }
 
     @Test
@@ -48,7 +61,7 @@ class ArticlesResourceTest {
                 .statusCode(200)
                 .extract().response();
         final JsonPath jsonPath = response.jsonPath();
-        assertEquals("Chardonnay", jsonPath.getString("[0].name"));
+        assertEquals("Mock article", jsonPath.getString("[0].name"));
     }
 
     @Test

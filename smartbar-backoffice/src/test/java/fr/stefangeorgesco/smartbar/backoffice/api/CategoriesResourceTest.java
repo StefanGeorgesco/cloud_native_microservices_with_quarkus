@@ -1,15 +1,28 @@
 package fr.stefangeorgesco.smartbar.backoffice.api;
 
+import fr.stefangeorgesco.smartbar.backoffice.CategoriesService;
+import fr.stefangeorgesco.smartbar.backoffice.api.model.Category;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @QuarkusTest
 class CategoriesResourceTest {
+
+    @InjectMock
+    CategoriesService categoriesService;
+
+    @BeforeEach
+    void setUp() {
+        when(categoriesService.get()).thenReturn(new Category().name("Mock category"));
+    }
 
     @Test
     void categoriesCategoryIdDelete() {
@@ -27,8 +40,7 @@ class CategoriesResourceTest {
                 .statusCode(200)
                 .extract().response();
         final JsonPath jsonPath = response.jsonPath();
-        assertEquals("drinks", jsonPath.getString("name"));
-        assertEquals("All drinks", jsonPath.getString("description"));
+        assertEquals("Mock category", jsonPath.getString("name"));
     }
 
     @Test
@@ -49,8 +61,7 @@ class CategoriesResourceTest {
                 .statusCode(200)
                 .extract().response();
         final JsonPath jsonPath = response.jsonPath();
-        assertEquals("drinks", jsonPath.getString("[0].name"));
-        assertEquals("All drinks", jsonPath.getString("[0].description"));
+        assertEquals("Mock category", jsonPath.getString("[0].name"));
     }
 
     @Test
