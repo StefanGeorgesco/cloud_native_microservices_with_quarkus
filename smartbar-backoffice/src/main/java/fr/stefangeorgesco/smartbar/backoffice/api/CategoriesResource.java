@@ -1,5 +1,6 @@
 package fr.stefangeorgesco.smartbar.backoffice.api;
 
+import fr.stefangeorgesco.smartbar.backoffice.CategoriesService;
 import fr.stefangeorgesco.smartbar.backoffice.api.model.Category;
 import io.smallrye.common.annotation.NonBlocking;
 import jakarta.ws.rs.core.Response;
@@ -10,7 +11,11 @@ import java.util.List;
 @NonBlocking
 public class CategoriesResource implements CategoriesApi {
 
-    private final Category category = new Category().name("drinks").description("All drinks");
+    private final CategoriesService categoriesService;
+
+    public CategoriesResource(CategoriesService categoriesService) {
+        this.categoriesService = categoriesService;
+    }
 
     @Override
     public Response categoriesCategoryIdDelete(String categoryId) {
@@ -19,7 +24,7 @@ public class CategoriesResource implements CategoriesApi {
 
     @Override
     public Response categoriesCategoryIdGet(String categoryId) {
-        return Response.ok().entity(category).build();
+        return Response.ok().entity(categoriesService.get()).build();
     }
 
     @Override
@@ -29,7 +34,7 @@ public class CategoriesResource implements CategoriesApi {
 
     @Override
     public Response categoriesGet() {
-        return Response.ok().entity(List.of(category)).build();
+        return Response.ok().entity(List.of(categoriesService.get())).build();
     }
 
     @Override

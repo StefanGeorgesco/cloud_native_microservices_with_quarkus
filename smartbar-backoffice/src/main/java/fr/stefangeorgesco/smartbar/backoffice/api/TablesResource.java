@@ -1,5 +1,6 @@
 package fr.stefangeorgesco.smartbar.backoffice.api;
 
+import fr.stefangeorgesco.smartbar.backoffice.TablesService;
 import fr.stefangeorgesco.smartbar.backoffice.api.model.Table;
 import io.smallrye.common.annotation.NonBlocking;
 import jakarta.ws.rs.core.Response;
@@ -10,7 +11,11 @@ import java.util.List;
 @NonBlocking
 public class TablesResource implements TablesApi {
 
-    private final Table table = new Table().name("chile");
+    private final TablesService tablesService;
+
+    public TablesResource(TablesService tablesService) {
+        this.tablesService = tablesService;
+    }
 
     @Override
     public Response tablesTableIdDelete(String tableId) {
@@ -19,7 +24,7 @@ public class TablesResource implements TablesApi {
 
     @Override
     public Response tablesTableIdGet(String tableId) {
-        return Response.ok(table).build();
+        return Response.ok(tablesService.get()).build();
     }
 
     @Override
@@ -29,7 +34,7 @@ public class TablesResource implements TablesApi {
 
     @Override
     public Response tablesGet() {
-        return Response.ok(List.of(table)).build();
+        return Response.ok(List.of(tablesService.get())).build();
     }
 
     @Override
