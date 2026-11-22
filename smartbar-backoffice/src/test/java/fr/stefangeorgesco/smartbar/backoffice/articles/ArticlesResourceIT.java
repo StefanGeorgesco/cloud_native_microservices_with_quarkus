@@ -1,8 +1,8 @@
-package fr.stefangeorgesco.smartbar.backoffice.api;
+package fr.stefangeorgesco.smartbar.backoffice.articles;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-public class TablesResourceIT extends TablesResourceTest {
+public class ArticlesResourceIT extends ArticlesResourceTest {
     // Execute the same tests but in packaged mode.
 }

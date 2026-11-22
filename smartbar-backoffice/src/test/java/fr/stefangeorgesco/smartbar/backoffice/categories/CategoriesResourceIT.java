@@ -1,4 +1,4 @@
-package fr.stefangeorgesco.smartbar.backoffice.api;
+package fr.stefangeorgesco.smartbar.backoffice.categories;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
