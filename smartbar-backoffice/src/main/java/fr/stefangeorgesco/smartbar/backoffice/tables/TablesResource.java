@@ -12,9 +12,11 @@ import java.util.Optional;
 public class TablesResource implements TablesApi {
 
     private final TablesCrudService tablesCrudService;
+    private final TableMapper tableMapper;
 
-    public TablesResource(TablesCrudService tablesCrudService) {
+    public TablesResource(TablesCrudService tablesCrudService, TableMapper tableMapper) {
         this.tablesCrudService = tablesCrudService;
+        this.tableMapper = tableMapper;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class TablesResource implements TablesApi {
         if (table.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok((TablesMapper.toApi(table.get()))).build();
+        return Response.ok((tableMapper.mapToApiTable(table.get()))).build();
     }
 
     @Override
@@ -42,7 +44,7 @@ public class TablesResource implements TablesApi {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final Table table = existingTable.get();
-        TablesMapper.updateEntity(table, apiTable);
+        tableMapper.mapToTable(apiTable, table);
         tablesCrudService.update(table);
         return Response.ok().build();
     }
@@ -51,14 +53,15 @@ public class TablesResource implements TablesApi {
     public Response tablesGet() {
         return Response.ok(tablesCrudService.getAll()
                         .stream()
-                        .map(TablesMapper::toApi)
+                        .map(tableMapper::mapToApiTable)
                         .toList())
                 .build();
     }
 
     @Override
     public Response tablesPost(ApiTable apiTable) {
-        final Table table = TablesMapper.toEntity(apiTable);
+        final Table table = new Table();
+        tableMapper.mapToTable(apiTable, table);
         final Table persistedTable = tablesCrudService.persist(table);
         return Response.created(URI.create("/tables/" + persistedTable.getId())).build();
     }

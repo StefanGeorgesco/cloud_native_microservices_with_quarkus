@@ -16,11 +16,14 @@ public class ArticlesResource implements ArticlesApi {
 
     private final ArticlesCrudService articlesCrudService;
     private final CategoriesCrudService categoriesCrudService;
+    private final ArticleMapper articleMapper;
 
     @Inject
-    public ArticlesResource(ArticlesCrudService articlesCrudService, CategoriesCrudService categoriesCrudService) {
+    public ArticlesResource(ArticlesCrudService articlesCrudService, CategoriesCrudService categoriesCrudService,
+                            ArticleMapper articleMapper) {
         this.articlesCrudService = articlesCrudService;
         this.categoriesCrudService = categoriesCrudService;
+        this.articleMapper = articleMapper;
     }
 
 
@@ -39,7 +42,7 @@ public class ArticlesResource implements ArticlesApi {
         if (article.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok((ArticlesMapper.toApi(article.get()))).build();
+        return Response.ok((articleMapper.toApiArticle(article.get()))).build();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class ArticlesResource implements ArticlesApi {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final Article article = existingArticle.get();
-        ArticlesMapper.updateEntity(article, apiArticle);
+        articleMapper.mapToArticle(apiArticle, article);
         articlesCrudService.update(article);
         return Response.ok().build();
     }
@@ -58,18 +61,19 @@ public class ArticlesResource implements ArticlesApi {
     public Response articlesGet() {
         return Response.ok(articlesCrudService.getAll()
                         .stream()
-                        .map(ArticlesMapper::toApi)
+                        .map(articleMapper::toApiArticle)
                         .toList())
                 .build();
     }
 
     @Override
-    public Response articlesPost(Long categoryId,ApiArticle apiArticle) {
+    public Response articlesPost(Long categoryId, ApiArticle apiArticle) {
         final Optional<Category> category = categoriesCrudService.getById(categoryId);
         if (category.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        final Article article = ArticlesMapper.toEntity(apiArticle);
+        final Article article = new Article();
+        articleMapper.mapToArticle(apiArticle, article);
         article.setCategory(category.get());
         final Article persitedArticle = articlesCrudService.persist(article);
         return Response.created(URI.create("/articles/" + persitedArticle.getId())).build();

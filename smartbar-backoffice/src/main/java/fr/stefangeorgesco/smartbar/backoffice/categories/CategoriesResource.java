@@ -12,9 +12,11 @@ import java.util.Optional;
 public class CategoriesResource implements CategoriesApi {
 
     private final CategoriesCrudService categoriesCrudService;
+    private final CategoryMapper categoryMapper;
 
-    public CategoriesResource(CategoriesCrudService categoriesCrudService) {
+    public CategoriesResource(CategoriesCrudService categoriesCrudService, CategoryMapper categoryMapper) {
         this.categoriesCrudService = categoriesCrudService;
+        this.categoryMapper = categoryMapper;
     }
 
 
@@ -33,7 +35,7 @@ public class CategoriesResource implements CategoriesApi {
         if (category.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok((CategoriesMapper.toApi(category.get()))).build();
+        return Response.ok((categoryMapper.mapToApiCategory(category.get()))).build();
     }
 
     @Override
@@ -43,7 +45,7 @@ public class CategoriesResource implements CategoriesApi {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final Category category = existingCategory.get();
-        CategoriesMapper.updateEntity(category, apiCategory);
+        categoryMapper.mapToCategory(apiCategory, category);
         categoriesCrudService.update(category);
         return Response.ok().build();
     }
@@ -52,14 +54,15 @@ public class CategoriesResource implements CategoriesApi {
     public Response categoriesGet() {
         return Response.ok(categoriesCrudService.getAll()
                         .stream()
-                        .map(CategoriesMapper::toApi)
+                        .map(categoryMapper::mapToApiCategory)
                         .toList())
                 .build();
     }
 
     @Override
     public Response categoriesPost(ApiCategory apiCategory) {
-        final Category category = CategoriesMapper.toEntity(apiCategory);
+        final Category category = new Category();
+        categoryMapper.mapToCategory(apiCategory, category);
         final Category persitedCategory = categoriesCrudService.persist(category);
         return Response.created(URI.create("/categories/" + persitedCategory.getId())).build();
     }
