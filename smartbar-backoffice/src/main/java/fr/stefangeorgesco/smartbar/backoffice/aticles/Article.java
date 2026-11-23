@@ -2,19 +2,33 @@ package fr.stefangeorgesco.smartbar.backoffice.aticles;
 
 import fr.stefangeorgesco.smartbar.backoffice.BaseEntity;
 import fr.stefangeorgesco.smartbar.backoffice.categories.Category;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "category_id"})
+})
 public class Article extends BaseEntity {
 
+    @NotNull
     private String name;
+
+    @NotNull
+    @Positive
     private BigDecimal price;
+
+    @NotNull
     private String description;
-    private String picture;
-    @ManyToOne
+
+    @NotNull
+    private String pictureBase64;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id")
     private Category category;
 
     public String getName() {
@@ -41,12 +55,12 @@ public class Article extends BaseEntity {
         this.description = description;
     }
 
-    public String getPicture() {
-        return picture;
+    public String getPictureBase64() {
+        return pictureBase64;
     }
 
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public void setPictureBase64(String pictureBase64) {
+        this.pictureBase64 = pictureBase64;
     }
 
     public Category getCategory() {

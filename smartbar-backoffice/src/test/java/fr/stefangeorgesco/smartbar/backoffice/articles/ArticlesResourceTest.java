@@ -25,7 +25,7 @@ class ArticlesResourceTest {
     // in packaged mode (ArticlesResourceIT), where CDI injection is unavailable.
     @BeforeEach
     void setUp() {
-        String categoryId = createCategory();
+        String categoryId = createCategory("drinks");
         String location = given()
                 .contentType("application/json")
                 .header("x-category-id", categoryId)
@@ -102,8 +102,7 @@ class ArticlesResourceTest {
                 .body("{\"name\":\"Merlot\",\"price\":6.5,\"description\":\"Red wine\",\"picture\":\"merlot.png\"}")
                 .when().put("/articles/" + articleId)
                 .then()
-                .statusCode(200)
-                .extract().header("Location");
+                .statusCode(200);
         ApiArticle updatedArticle = getApiArticle(articleId);
         assertEquals("Merlot", updatedArticle.getName());
         assertEquals(new BigDecimal("6.50"), updatedArticle.getPrice());
@@ -134,7 +133,7 @@ class ArticlesResourceTest {
 
     @Test
     void articlesPost() {
-        String categoryId = createCategory();
+        String categoryId = createCategory("other");
         String location = given()
                 .contentType("application/json")
                 .header("x-category-id", categoryId)
@@ -151,10 +150,10 @@ class ArticlesResourceTest {
         assertEquals("chardonnay.png", createdArticle.getPicture());
     }
 
-    private String createCategory() {
+    private String createCategory(String name) {
         String location = given()
                 .contentType("application/json")
-                .body("{\"name\":\"drinks\",\"description\":\"All drinks\"}")
+                .body("{\"name\":\"%s\",\"description\":\"%s\"}".formatted(name, name))
                 .when().post("/categories")
                 .then()
                 .statusCode(201)

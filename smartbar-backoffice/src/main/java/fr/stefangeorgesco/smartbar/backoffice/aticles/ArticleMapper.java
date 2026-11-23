@@ -10,7 +10,9 @@ import org.mapstruct.MappingTarget;
 public interface ArticleMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(source = "picture", target = "pictureBase64")
     void mapToArticle(ApiArticle apiArticle, @MappingTarget Article article);
 
+    @Mapping(source = "pictureBase64", target = "picture")
     ApiArticle toApiArticle(Article article);
 }

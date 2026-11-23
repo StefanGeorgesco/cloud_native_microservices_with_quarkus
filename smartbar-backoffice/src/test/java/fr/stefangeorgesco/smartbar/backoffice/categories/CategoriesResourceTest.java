@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CategoriesResourceTest {
 
     private static final String DRINKS = "{\"name\":\"drinks\",\"description\":\"All drinks\"}";
+    private static final String FOOD = "{\"name\":\"food\",\"description\":\"All food\"}";
 
     private String categoryId;
 
@@ -87,7 +88,7 @@ class CategoriesResourceTest {
     void categoriesCategoryIdPut() {
         given()
                 .contentType("application/json")
-                .body("{\"name\":\"food\",\"description\":\"All food\"}")
+                .body(FOOD)
                 .when().put("/categories/" + categoryId)
                 .then()
                 .statusCode(200);
@@ -121,15 +122,15 @@ class CategoriesResourceTest {
     void categoriesPost() {
         String location = given()
                 .contentType("application/json")
-                .body(DRINKS)
+                .body(FOOD)
                 .when().post("/categories")
                 .then()
                 .statusCode(201)
                 .extract().header("Location");
         String createdCategoryId = location.substring(location.lastIndexOf('/') + 1);
         ApiCategory createdCategory = getApiCategory(createdCategoryId);
-        assertEquals("drinks", createdCategory.getName());
-        assertEquals("All drinks", createdCategory.getDescription());
+        assertEquals("food", createdCategory.getName());
+        assertEquals("All food", createdCategory.getDescription());
     }
 
     private ApiCategory getApiCategory(String categoryId) {

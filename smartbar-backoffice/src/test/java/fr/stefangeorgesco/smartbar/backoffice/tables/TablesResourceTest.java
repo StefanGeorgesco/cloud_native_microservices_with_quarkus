@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TablesResourceTest {
 
     private static final String CHILE = "{\"name\":\"Chile\",\"seatCount\":4,\"active\":true}";
+    private static final String PERU = "{\"name\":\"Peru\",\"seatCount\":6,\"active\":false}";
 
     private String tableId;
 
@@ -123,16 +124,16 @@ class TablesResourceTest {
     void tablesPost() {
         String location = given()
                 .contentType("application/json")
-                .body(CHILE)
+                .body(PERU)
                 .when().post("/tables")
                 .then()
                 .statusCode(201)
                 .extract().header("Location");
         String createdTableId = location.substring(location.lastIndexOf('/') + 1);
         ApiTable createdTable = getApiTable(createdTableId);
-        assertEquals("Chile", createdTable.getName());
-        assertEquals(4, createdTable.getSeatCount());
-        assertTrue(createdTable.getActive());
+        assertEquals("Peru", createdTable.getName());
+        assertEquals(6, createdTable.getSeatCount());
+        assertFalse(createdTable.getActive());
 
     }
 

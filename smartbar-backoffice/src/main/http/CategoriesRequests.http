@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "name": "wine",
-    "description": "A category for all wine products"
+  "description": "A category for all wine products"
 }
 
 ### Modify
