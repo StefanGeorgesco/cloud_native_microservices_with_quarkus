@@ -1,10 +1,14 @@
 # suppress inspection "UnusedProperty" for whole file
 # Port de production
-quarkus.http.port=7070
-# Base de production (prod)
-quarkus.datasource.username=bob
-quarkus.datasource.password=bob
-quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:6000/smartbar-bo-prod
+quarkus:
+  http:
+    port: 7070
+  # Base de production (prod)
+  datasource:
+    username: bob
+    password: bob
+    jdbc:
+      url: jdbc:postgresql://localhost:6000/smartbar-bo-prod
 
 # Optionnel : version de l'image utilisée par Dev Services
 # %test.quarkus.datasource.devservices.image-name=postgres:17

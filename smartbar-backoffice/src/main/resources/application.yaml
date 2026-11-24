@@ -1,0 +1,10 @@
+quarkus:
+  datasource:
+    db-kind: postgresql
+  hibernate-orm:
+    schema-management:
+      strategy: drop-and-create
+
+smartbar:
+  backoffice:
+    my-text: Foo

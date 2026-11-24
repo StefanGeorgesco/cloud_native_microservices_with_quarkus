@@ -1,8 +1,14 @@
 # suppress inspection "UnusedProperty" for whole file
 # Base locale (dev). En test, aucune URL : Dev Services lance un conteneur Postgres dédié.
-quarkus.datasource.username=bob
-quarkus.datasource.password=bob
-quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/smartbar-bo-dev
+quarkus:
+  datasource:
+    username: bob
+    password: bob
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/smartbar-bo-dev
 
 # Optionnel : version de l'image utilisée par Dev Services
-# quarkus.datasource.devservices.image-name=postgres:17
+# quarkus:
+#   datasource:
+#     devservices:
+#       image-name: postgres:17
