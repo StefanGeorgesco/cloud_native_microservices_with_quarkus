@@ -2,10 +2,16 @@
 # Base locale (dev). En test, aucune URL : Dev Services lance un conteneur Postgres dédié.
 quarkus:
   datasource:
-    username: bob
-    password: bob
-    jdbc:
-      url: jdbc:postgresql://localhost:5432/smartbar-bo-dev
+    devservices:
+      image-name: postgres:18
+      port: 5432
+      db-name: smartbar-bo-dev
+      username: bob
+      password: bob
+#    username: bob
+#    password: bob
+#    jdbc:
+#      url: jdbc:postgresql://localhost:5432/smartbar-bo-dev
 
 # Optionnel : version de l'image utilisée par Dev Services
 # quarkus:
