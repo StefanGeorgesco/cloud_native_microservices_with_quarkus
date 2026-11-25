@@ -2,43 +2,39 @@ package fr.stefangeorgesco.smartbar.backoffice.aticles;
 
 import fr.stefangeorgesco.smartbar.backoffice.api.ArticlesApi;
 import fr.stefangeorgesco.smartbar.backoffice.api.model.ApiArticle;
-import fr.stefangeorgesco.smartbar.backoffice.categories.CategoriesCrudService;
 import fr.stefangeorgesco.smartbar.backoffice.categories.Category;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
 public class ArticlesResource implements ArticlesApi {
 
-    private final ArticlesCrudService articlesCrudService;
-    private final CategoriesCrudService categoriesCrudService;
     private final ArticleMapper articleMapper;
 
     @Inject
-    public ArticlesResource(ArticlesCrudService articlesCrudService, CategoriesCrudService categoriesCrudService,
-                            ArticleMapper articleMapper) {
-        this.articlesCrudService = articlesCrudService;
-        this.categoriesCrudService = categoriesCrudService;
+    public ArticlesResource(ArticleMapper articleMapper) {
         this.articleMapper = articleMapper;
     }
 
 
     @Override
     public Response articlesArticleIdDelete(Long articleId) {
-        final Optional<Article> article = articlesCrudService.deleteById(articleId);
+        final Optional<Article> article = Article.findByIdOptional(articleId);
         if (article.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        article.get().delete();
         return Response.noContent().build();
     }
 
     @Override
     public Response articlesArticleIdGet(Long articleId) {
-        final Optional<Article> article = articlesCrudService.getById(articleId);
+        final Optional<Article> article = Article.findByIdOptional(articleId);
         if (article.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -47,19 +43,19 @@ public class ArticlesResource implements ArticlesApi {
 
     @Override
     public Response articlesArticleIdPut(Long articleId, ApiArticle apiArticle) {
-        final Optional<Article> existingArticle = articlesCrudService.getById(articleId);
+        final Optional<Article> existingArticle = Article.findByIdOptional(articleId);
         if (existingArticle.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final Article article = existingArticle.get();
         articleMapper.mapToArticle(apiArticle, article);
-        articlesCrudService.update(article);
         return Response.ok().build();
     }
 
     @Override
     public Response articlesGet() {
-        return Response.ok(articlesCrudService.getAll()
+        final List<Article> articles = Article.listAll();
+        return Response.ok(articles
                         .stream()
                         .map(articleMapper::toApiArticle)
                         .toList())
@@ -68,14 +64,14 @@ public class ArticlesResource implements ArticlesApi {
 
     @Override
     public Response articlesPost(Long categoryId, ApiArticle apiArticle) {
-        final Optional<Category> category = categoriesCrudService.getById(categoryId);
+        final Optional<Category> category = Category.findByIdOptional(categoryId);
         if (category.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final Article article = new Article();
         articleMapper.mapToArticle(apiArticle, article);
-        article.setCategory(category.get());
-        final Article persitedArticle = articlesCrudService.persist(article);
-        return Response.created(URI.create("/articles/" + persitedArticle.getId())).build();
+        article.category = category.get();
+        article.persist();
+        return Response.created(URI.create("/articles/" + article.id)).build();
     }
 }

@@ -2,35 +2,37 @@ package fr.stefangeorgesco.smartbar.backoffice.tables;
 
 import fr.stefangeorgesco.smartbar.backoffice.api.TablesApi;
 import fr.stefangeorgesco.smartbar.backoffice.api.model.ApiTable;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
 public class TablesResource implements TablesApi {
 
-    private final TablesCrudService tablesCrudService;
     private final TableMapper tableMapper;
 
-    public TablesResource(TablesCrudService tablesCrudService, TableMapper tableMapper) {
-        this.tablesCrudService = tablesCrudService;
+    @Inject
+    public TablesResource(TableMapper tableMapper) {
         this.tableMapper = tableMapper;
     }
 
     @Override
     public Response tablesTableIdDelete(Long tableId) {
-        final Optional<Table> table = tablesCrudService.deleteById(tableId);
+        final Optional<Table> table = Table.findByIdOptional(tableId);
         if (table.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        table.get().delete();
         return Response.noContent().build();
     }
 
     @Override
     public Response tablesTableIdGet(Long tableId) {
-        final Optional<Table> table = tablesCrudService.getById(tableId);
+        final Optional<Table> table = Table.findByIdOptional(tableId);
         if (table.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -39,19 +41,19 @@ public class TablesResource implements TablesApi {
 
     @Override
     public Response tablesTableIdPut(Long tableId, ApiTable apiTable) {
-        final Optional<Table> existingTable = tablesCrudService.getById(tableId);
+        final Optional<Table> existingTable = Table.findByIdOptional(tableId);
         if (existingTable.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final Table table = existingTable.get();
         tableMapper.mapToTable(apiTable, table);
-        tablesCrudService.update(table);
         return Response.ok().build();
     }
 
     @Override
     public Response tablesGet() {
-        return Response.ok(tablesCrudService.getAll()
+        final List<Table> tables = Table.listAll();
+        return Response.ok(tables
                         .stream()
                         .map(tableMapper::mapToApiTable)
                         .toList())
@@ -62,7 +64,7 @@ public class TablesResource implements TablesApi {
     public Response tablesPost(ApiTable apiTable) {
         final Table table = new Table();
         tableMapper.mapToTable(apiTable, table);
-        final Table persistedTable = tablesCrudService.persist(table);
-        return Response.created(URI.create("/tables/" + persistedTable.getId())).build();
+        table.persist();
+        return Response.created(URI.create("/tables/" + table.id)).build();
     }
 }
