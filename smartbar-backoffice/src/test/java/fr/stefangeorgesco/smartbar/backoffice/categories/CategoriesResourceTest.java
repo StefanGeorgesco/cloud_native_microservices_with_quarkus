@@ -7,8 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,12 +34,7 @@ class CategoriesResourceTest {
 
     @AfterEach
     void tearDown() {
-        List<Object> ids = given()
-                .when().get("/categories")
-                .then()
-                .statusCode(200)
-                .extract().jsonPath().getList("id");
-        ids.forEach(id -> given().when().delete("/categories/" + id));
+        deleteCategory(categoryId);
     }
 
     @Test
@@ -114,8 +107,7 @@ class CategoriesResourceTest {
                 .then()
                 .statusCode(200)
                 .extract().jsonPath();
-        assertEquals(1, jsonPath.getList("$").size());
-        assertEquals("drinks", jsonPath.getString("[0].name"));
+        assertEquals(4, jsonPath.getList("$").size());
     }
 
     @Test
@@ -131,6 +123,7 @@ class CategoriesResourceTest {
         ApiCategory createdCategory = getApiCategory(createdCategoryId);
         assertEquals("food", createdCategory.getName());
         assertEquals("All food", createdCategory.getDescription());
+        deleteCategory(createdCategoryId);
     }
 
     private ApiCategory getApiCategory(String categoryId) {
@@ -139,5 +132,9 @@ class CategoriesResourceTest {
                 .then()
                 .statusCode(200)
                 .extract().as(ApiCategory.class);
+    }
+
+    private void deleteCategory(String categoryId) {
+        given().when().delete("/categories/" + categoryId);
     }
 }

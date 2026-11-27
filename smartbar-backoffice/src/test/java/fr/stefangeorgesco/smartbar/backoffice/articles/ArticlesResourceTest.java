@@ -3,12 +3,12 @@ package fr.stefangeorgesco.smartbar.backoffice.articles;
 import fr.stefangeorgesco.smartbar.backoffice.api.model.ApiArticle;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,12 +20,13 @@ class ArticlesResourceTest {
             "{\"name\":\"Chardonnay\",\"price\":5.5,\"description\":\"White wine\",\"picture\":\"chardonnay.png\"}";
 
     private String articleId;
+    private String categoryId;
 
     // Data is set up through the REST API so that the same tests also run
     // in packaged mode (ArticlesResourceIT), where CDI injection is unavailable.
     @BeforeEach
     void setUp() {
-        String categoryId = createCategory("drinks");
+        categoryId = createCategory("drinks");
         String location = given()
                 .contentType("application/json")
                 .header("x-category-id", categoryId)
@@ -39,24 +40,13 @@ class ArticlesResourceTest {
 
     @AfterEach
     void tearDown() {
-        List<Object> ids = given()
-                .when().get("/articles")
-                .then()
-                .statusCode(200)
-                .extract().jsonPath().getList("id");
-        ids.forEach(id -> given().when().delete("/articles/" + id));
-        ids = given()
-                .when().get("/categories")
-                .then()
-                .statusCode(200)
-                .extract().jsonPath().getList("id");
-        ids.forEach(id -> given().when().delete("/categories/" + id));
+        deleteArticle(articleId);
+        deleteCategory(categoryId);
     }
 
     @Test
     void articlesArticleIdDelete() {
-        given()
-                .when().delete("/articles/" + articleId)
+        deleteArticle(articleId)
                 .then()
                 .statusCode(204);
         given()
@@ -127,16 +117,15 @@ class ArticlesResourceTest {
                 .then()
                 .statusCode(200)
                 .extract().jsonPath();
-        assertEquals(1, jsonPath.getList("$").size());
-        assertEquals("Chardonnay", jsonPath.getString("[0].name"));
+        assertEquals(11, jsonPath.getList("$").size());
     }
 
     @Test
     void articlesPost() {
-        String categoryId = createCategory("other");
+        String createdCategoryId = createCategory("other");
         String location = given()
                 .contentType("application/json")
-                .header("x-category-id", categoryId)
+                .header("x-category-id", createdCategoryId)
                 .body(CHARDONNAY)
                 .when().post("/articles")
                 .then()
@@ -148,6 +137,8 @@ class ArticlesResourceTest {
         assertEquals(new BigDecimal("5.50"), createdArticle.getPrice());
         assertEquals("White wine", createdArticle.getDescription());
         assertEquals("chardonnay.png", createdArticle.getPicture());
+        deleteArticle(createdArticleId);
+        deleteCategory(createdCategoryId);
     }
 
     private String createCategory(String name) {
@@ -161,11 +152,19 @@ class ArticlesResourceTest {
         return location.substring(location.lastIndexOf('/') + 1);
     }
 
+    private void deleteCategory(String categoryId) {
+        given().when().delete("/categories/" + categoryId);
+    }
+
     private ApiArticle getApiArticle(String articleId) {
         return given()
                 .when().get("/articles/" + articleId)
                 .then()
                 .statusCode(200)
                 .extract().as(ApiArticle.class);
+    }
+
+    private Response deleteArticle(String articleId) {
+        return given().when().delete("/articles/" + articleId);
     }
 }

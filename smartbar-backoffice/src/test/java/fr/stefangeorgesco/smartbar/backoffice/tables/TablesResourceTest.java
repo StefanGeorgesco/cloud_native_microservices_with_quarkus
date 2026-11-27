@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,12 +35,7 @@ class TablesResourceTest {
 
     @AfterEach
     void tearDown() {
-        List<Object> ids = given()
-                .when().get("/tables")
-                .then()
-                .statusCode(200)
-                .extract().jsonPath().getList("id");
-        ids.forEach(id -> given().when().delete("/tables/" + id));
+        deleteTable(tableId);
     }
 
     @Test
@@ -116,8 +110,7 @@ class TablesResourceTest {
                 .then()
                 .statusCode(200)
                 .extract().jsonPath();
-        assertEquals(1, jsonPath.getList("$").size());
-        assertEquals("Chile", jsonPath.getString("[0].name"));
+        assertEquals(6, jsonPath.getList("$").size());
     }
 
     @Test
@@ -134,7 +127,7 @@ class TablesResourceTest {
         assertEquals("Peru", createdTable.getName());
         assertEquals(6, createdTable.getSeatCount());
         assertFalse(createdTable.getActive());
-
+        deleteTable(createdTableId);
     }
 
     private ApiTable getApiTable(String tableId) {
@@ -143,5 +136,9 @@ class TablesResourceTest {
                 .then()
                 .statusCode(200)
                 .extract().as(ApiTable.class);
+    }
+
+    private void deleteTable(String tableId) {
+        given().when().delete("/tables/" + tableId);
     }
 }

@@ -3,7 +3,7 @@ POST {{url}}/tables
 Content-Type: application/json
 
 {
-  "name": "Oslo",
+  "name": "Paris",
   "seatCount": 8,
   "active": false
 }
@@ -13,7 +13,7 @@ PUT {{url}}/tables/101
 Content-Type: application/json
 
 {
-  "name": "Oslo",
+  "name": "Paris",
   "seatCount": 8,
   "active": true
 }
