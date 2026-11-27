@@ -1,7 +1,8 @@
 package fr.stefangeorgesco.smartbar.backoffice.tables;
 
+import fr.stefangeorgesco.smartbar.backoffice.categories.CategoriesRepository;
 import fr.stefangeorgesco.smartbar.backoffice.categories.Category;
-import io.quarkus.panache.mock.PanacheMock;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -17,12 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @QuarkusTest
 public class TablesResourceMockExampleTest {
 
+    @InjectMock
+    @SuppressWarnings("unused")
+    private CategoriesRepository categoriesRepository;
+
     @BeforeEach
     void setUp() {
-        PanacheMock.mock(Category.class);
         final Category category = new Category();
-        category.name = "Mock";
-        Mockito.when(Category.listAll()).thenReturn(List.of(category));
+        category.setName("Mock");
+        Mockito.when(categoriesRepository.listAll()).thenReturn(List.of(category));
     }
 
     @Test

@@ -11,7 +11,7 @@ x-category-id: 1
 }
 
 ### Modify
-PUT {{url}}/articles/1
+PUT {{url}}/articles/51
 Content-Type: application/json
 
 {
@@ -25,7 +25,7 @@ Content-Type: application/json
 GET {{url}}/articles
 
 ### Get single
-GET {{url}}/articles/1
+GET {{url}}/articles/51
 
 ### Delete
-DELETE {{url}}/articles/1
+DELETE {{url}}/articles/51

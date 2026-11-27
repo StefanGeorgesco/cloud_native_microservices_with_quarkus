@@ -13,27 +13,29 @@ import java.util.Optional;
 @Transactional
 public class CategoriesResource implements CategoriesApi {
 
+    private final CategoriesRepository categoriesRepository;
     private final CategoryMapper categoryMapper;
 
     @Inject
-    public CategoriesResource(CategoryMapper categoryMapper) {
+    public CategoriesResource(CategoriesRepository categoriesRepository, CategoryMapper categoryMapper) {
+        this.categoriesRepository = categoriesRepository;
         this.categoryMapper = categoryMapper;
     }
 
 
     @Override
     public Response categoriesCategoryIdDelete(Long categoryId) {
-        final Optional<Category> category = Category.findByIdOptional(categoryId);
+        final Optional<Category> category = categoriesRepository.findByIdOptional(categoryId);
         if (category.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        category.get().delete();
+        categoriesRepository.delete(category.get());
         return Response.noContent().build();
     }
 
     @Override
     public Response categoriesCategoryIdGet(Long categoryId) {
-        final Optional<Category> category = Category.findByIdOptional(categoryId);
+        final Optional<Category> category = categoriesRepository.findByIdOptional(categoryId);
         if (category.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -42,7 +44,7 @@ public class CategoriesResource implements CategoriesApi {
 
     @Override
     public Response categoriesCategoryIdPut(Long categoryId, ApiCategory apiCategory) {
-        final Optional<Category> existingCategory = Category.findByIdOptional(categoryId);
+        final Optional<Category> existingCategory = categoriesRepository.findByIdOptional(categoryId);
         if (existingCategory.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -53,7 +55,7 @@ public class CategoriesResource implements CategoriesApi {
 
     @Override
     public Response categoriesGet() {
-        final List<Category> categories = Category.listAll();
+        final List<Category> categories = categoriesRepository.listAll();
         return Response.ok(categories
                         .stream()
                         .map(categoryMapper::mapToApiCategory)
@@ -65,7 +67,7 @@ public class CategoriesResource implements CategoriesApi {
     public Response categoriesPost(ApiCategory apiCategory) {
         final Category category = new Category();
         categoryMapper.mapToCategory(apiCategory, category);
-        category.persist();
-        return Response.created(URI.create("/categories/" + category.id)).build();
+        categoriesRepository.persist(category);
+        return Response.created(URI.create("/categories/" + category.getId())).build();
     }
 }

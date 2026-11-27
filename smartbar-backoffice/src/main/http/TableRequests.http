@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Modify
-PUT {{url}}/tables/1
+PUT {{url}}/tables/101
 Content-Type: application/json
 
 {
@@ -22,7 +22,7 @@ Content-Type: application/json
 GET {{url}}/tables
 
 ### Get single
-GET {{url}}/tables/1
+GET {{url}}/tables/101
 
 ### Delete
-DELETE {{url}}/tables/1
+DELETE {{url}}/tables/101
