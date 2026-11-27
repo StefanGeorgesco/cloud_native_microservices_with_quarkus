@@ -141,6 +141,17 @@ class ArticlesResourceTest {
         deleteCategory(createdCategoryId);
     }
 
+    @Test
+    void articlesByCategoryIdGet() {
+        JsonPath jsonPath = given()
+                .when().get("/articles/category/1000")
+                .then()
+                .statusCode(200)
+                .extract().jsonPath();
+        assertEquals(2, jsonPath.getList("$").size());
+        assertEquals("Iced coffee", jsonPath.getString("[0].name"));
+    }
+
     private String createCategory(String name) {
         String location = given()
                 .contentType("application/json")

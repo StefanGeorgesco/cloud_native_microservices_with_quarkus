@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "category_id"})
 })
+@NamedQuery(name="Article.byCategory", query="from Article where category = ?1 order by price desc")
 public class Article extends BaseEntity {
 
     @NotNull

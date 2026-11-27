@@ -6,6 +6,10 @@ import fr.stefangeorgesco.smartbar.backoffice.categories.CategoriesRepository;
 import fr.stefangeorgesco.smartbar.backoffice.categories.Category;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
@@ -78,5 +82,21 @@ public class ArticlesResource implements ArticlesApi {
         article.setCategory(category.get());
         articlesRepository.persist(article);
         return Response.created(URI.create("/articles/" + article.getId())).build();
+    }
+
+    @GET
+    @Path("/category/{categoryId}")
+    @Produces("application/json")
+    public Response articlesByCategoryIdGet(@PathParam("categoryId") Long categoryId) {
+        final Optional<Category> category = categoriesRepository.findByIdOptional(categoryId);
+        if (category.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        final List<Article> articles = articlesRepository.listByCategory(category.get());
+        return Response.ok(articles
+                        .stream()
+                        .map(articleMapper::toApiArticle)
+                        .toList())
+                .build();
     }
 }
